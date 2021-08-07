@@ -22,8 +22,8 @@ Day1/poly/LoginType.java
  Day1.poly.LoginType
 Day1/poly/NaverLogin.java
  Day1.poly.NaverLogin
-Day2/collection/User.java
- Day2.collection.User
+Day2/stream/Main2.java
+ Day2.stream.Main2
 Day1/def/Main.java
  Day1.def.Main
  Day1.def.MyInterface
@@ -32,8 +32,11 @@ Day1/lambda/MyRunnable.java
 Day1/def2/Main.java
  Day1.def2.Main
  Day1.def2.Service
-Day2/collection/Main2.java
- Day2.collection.Main2
+Day1/def3/Ability.java
+ Day1.def3.Ability
+ Day1.def3.Flyable
+ Day1.def3.Swimmable
+ Day1.def3.Walkable
 Day1/func/Main2.java
  Day1.func.Main2
  Day1.func.Main2$1
@@ -71,12 +74,13 @@ Day2/collection/Main.java
  Day2.collection.Main
 Day1/poly/KakaoLogin.java
  Day1.poly.KakaoLogin
-Day1/def3/Ability.java
- Day1.def3.Ability
- Day1.def3.Flyable
- Day1.def3.Swimmable
- Day1.def3.Walkable
-Day2/stream/Main2.java
- Day2.stream.Main2
+Day2/collection/Main2.java
+ Day2.collection.Main2
+Day2/collection/User.java
+ Day2.collection.User
+Day2/optional/Main2.java
+ Day2.optional.Main2
+Day2/optional/Main.java
+ Day2.optional.Main
 Day2/stream/Main3.java
  Day2.stream.Main3

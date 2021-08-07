@@ -1,5 +1,6 @@
 package Day2.stream;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,6 +14,9 @@ public class Main {
                 .map(s -> s.length())
                 .filter(i -> i % 2 == 1)
                 .forEach(System.out::println);
+
+
+
 
     }
 
