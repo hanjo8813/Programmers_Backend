@@ -2,6 +2,8 @@ package org.prgrms.kdt;
 
 import org.prgrms.kdt.order.Order;
 import org.prgrms.kdt.voucher.Voucher;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +25,30 @@ import org.springframework.context.annotation.Configuration;
 )
  */
 public class AppConfiguration {
+
+ @Bean(initMethod = "init")
+ public BeanOne beanOne(){
+  return new BeanOne();
+ }
+
+
+ class BeanOne implements InitializingBean {
+  public void init() {
+   System.out.println("init Called");
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+   System.out.println("afterPropertiesSet Called");
+  }
+ }
+
+
+
+
+
+
+
     /*
     @Bean
     public VoucherRepository voucherRepository(){
