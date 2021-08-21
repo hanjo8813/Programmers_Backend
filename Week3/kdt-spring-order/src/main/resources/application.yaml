@@ -1,0 +1,46 @@
+kdt:
+  version: "v1.0-default"
+  minimum-order-amount : 1
+  support-vendors :
+    - a
+    - b
+    - c
+  description : |-
+    line 1 a
+    line 2 b
+    line 3 c
+
+
+#servers:
+#  - dev.bar.com
+#  - foo.bar.com
+#
+#---
+#
+#spring.config.activate.on-profile: local
+#kdt:
+#  version: "v1.0-local"
+#  minimum-order-amount : 1
+#  support-vendors :
+#    - a
+#    - b
+#    - c
+#  description : |-
+#    line 1 a
+#    line 2 b
+#    line 3 c
+#
+#---
+#
+#spring.config.activate.on-profile: dev
+#kdt:
+#  version: "v1.0-dev"
+#  minimum-order-amount : 1
+#  support-vendors :
+#    - a
+#    - b
+#    - c
+#  description : |-
+#    line 1 a
+#    line 2 b
+#    line 3 c

@@ -1,18 +1,15 @@
-package org.prgrms.kdt;
+package org.prgrms.kdt.config;
 
-import org.prgrms.kdt.order.Order;
-import org.prgrms.kdt.voucher.Voucher;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
-// 서비스 간 의존관계 맺기를 담당
-
-@Configuration
-//@ComponentScan(basePackages = {"org.prgrms.kdt.order", "org.prgrms.kdt.voucher"})
 // 베이스가 되는 클래스 이름으로도 지정 가능
- @ComponentScan(basePackageClasses = {Order.class, Voucher.class})
+//@ComponentScan(basePackageClasses = {Order.class, Voucher.class})
+
 /* 스캔시 필터링 대상 지정
 @ComponentScan(
         basePackages = {"org.prgrms.kdt.order", "org.prgrms.kdt.voucher"},
@@ -24,30 +21,32 @@ import org.springframework.context.annotation.Configuration;
         }
 )
  */
+// @PropertySource("application.properties")
+
+@Configuration
+@ComponentScan(basePackages = {"org.prgrms.kdt.order", "org.prgrms.kdt.voucher", "org.prgrms.kdt.config"})
+@PropertySource(value = {"application.yaml"}, factory = YamlPropertiesFactory.class)
+@EnableConfigurationProperties
 public class AppConfiguration {
-
- @Bean(initMethod = "init")
- public BeanOne beanOne(){
-  return new BeanOne();
- }
-
-
- class BeanOne implements InitializingBean {
-  public void init() {
-   System.out.println("init Called");
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-   System.out.println("afterPropertiesSet Called");
-  }
- }
+}
+    /*
+    @Bean(initMethod = "init")
+    public BeanOne beanOne() {
+        return new BeanOne();
+    }
 
 
+    class BeanOne implements InitializingBean {
+        public void init() {
+            System.out.println("init Called");
+        }
 
-
-
-
+        @Override
+        public void afterPropertiesSet() throws Exception {
+            System.out.println("afterPropertiesSet Called");
+        }
+    }
+    */
 
     /*
     @Bean
@@ -84,4 +83,4 @@ public class AppConfiguration {
     public OrderService orderService(VoucherService voucherService, OrderRepository orderRepository) {
         return new OrderService(voucherService, orderRepository);
     }*/
-}
+
