@@ -1,5 +1,8 @@
-package org.prgrms.kdt.config;
+package org.prgrms.kdt.order.properties;
 
+import org.prgrms.kdt.OrderTester;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +13,11 @@ import org.springframework.stereotype.Component;
 import java.text.MessageFormat;
 import java.util.List;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "kdt")
 public class OrderProperties implements InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderTester.class);
 
     private String version;
 
@@ -24,10 +29,10 @@ public class OrderProperties implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.out.println(MessageFormat.format("[Bean 생성시] version -> {0}", version));
-        System.out.println(MessageFormat.format("[Bean 생성시] minimumOrderAmount -> {0}", minimumOrderAmount));
-        System.out.println(MessageFormat.format("[Bean 생성시] supportVendors -> {0}", supportVendors));
-        System.out.println(MessageFormat.format("[Bean 생성시] description -> {0}", description));
+        logger.debug("[Bean 생성시] version -> {}", version);
+        logger.debug("[Bean 생성시] minimumOrderAmount -> {}", minimumOrderAmount);
+        logger.debug("[Bean 생성시] supportVendors -> {}", supportVendors);
+        logger.debug("[Bean 생성시] description -> {}", description);
     }
 
     public void setVersion(String version) {
