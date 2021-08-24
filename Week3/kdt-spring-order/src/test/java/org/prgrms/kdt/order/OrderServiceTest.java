@@ -46,7 +46,7 @@ class OrderServiceTest {
                 fixedAmountVoucher.getVoucherId()
         );
 
-        // Then
+        // Then - 상태 관점
         assertThat(order.totalAmount(), is(100L));
         assertThat(order.getVoucher().isEmpty(), is(false));
         assertThat(order.getVoucher().get().getVoucherId(), is(fixedAmountVoucher.getVoucherId()));
@@ -58,19 +58,33 @@ class OrderServiceTest {
     void createOrderByMock() {
 
         // Given
-        var voucherService = mock(VoucherService.class);
+        var voucherServiceMock = mock(VoucherService.class);
         var orderRepositoryMock = mock(OrderRepository.class);
         var fixedAmountVoucher = new FixedAmountVoucher(UUID.randomUUID(), 100);
+        // voucherService의 getVoucher 메소드의 리턴값을 임시로 정의해준다
+        when(voucherServiceMock.getVoucher(fixedAmountVoucher.getVoucherId()))
+                .thenReturn(fixedAmountVoucher);
+        var sut = new OrderService(voucherServiceMock,orderRepositoryMock);
 
-        when(voucherService.getVoucher(fixedAmountVoucher.getVoucherId())).thenReturn(fixedAmountVoucher);
+        // When - 테스트하고 싶은 행위를 실행
+        var order = sut.createOrder(
+                UUID.randomUUID(),
+                List.of(new OrderItem(UUID.randomUUID(),200,1)),
+                fixedAmountVoucher.getVoucherId()
+        );
 
-        var sut = new OrderService(voucherService,orderRepositoryMock);
+        // Then - 목적 행위와 관련된 행위가 잘 실행되었는지 본다
+        assertThat(order.totalAmount(), is(100L));
+        assertThat(order.getVoucher().isEmpty(), is(false));
 
-        // 14:50
+        // 테스트할 메소드의 순서를 정의 (순서에 사용되는 Mock을 넣어줌)
+       var inOrder = inOrder(voucherServiceMock, orderRepositoryMock);
 
-        // When
+        // 정의한 행위에서 메소드가 호출되었는지 여부를 검사한다
+        inOrder.verify(voucherServiceMock).getVoucher(fixedAmountVoucher.getVoucherId());
+        inOrder.verify(orderRepositoryMock).insert(order);
+        inOrder.verify(voucherServiceMock).useVoucher(fixedAmountVoucher);
 
-        // Then
     }
 
 }
