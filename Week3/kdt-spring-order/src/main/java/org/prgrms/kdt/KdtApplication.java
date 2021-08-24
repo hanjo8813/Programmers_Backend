@@ -15,11 +15,11 @@ public class KdtApplication {
 
 	public static void main(String[] args) {
 
-//		var springApplication = new SpringApplication(KdtApplication.class);
-//		springApplication.setAdditionalProfiles("local");
-//		var applicationContext = springApplication.run(args);
+		var springApplication = new SpringApplication(KdtApplication.class);
+		springApplication.setAdditionalProfiles("dev");
+		var applicationContext = springApplication.run(args);
 
-		var applicationContext = SpringApplication.run(KdtApplication.class, args);
+		//var applicationContext = SpringApplication.run(KdtApplication.class, args);
 
 		var orderProperties = applicationContext.getBean(OrderProperties.class);
 		logger.warn("logger name => {}", logger.getName());
