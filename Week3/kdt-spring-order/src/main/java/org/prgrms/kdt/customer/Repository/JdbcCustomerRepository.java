@@ -24,9 +24,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcCustomerRepository.class);
 
-    // dataSource는 Auto wired로 의존성 주입됨
-    private final DataSource dataSource;
-
+    // DataSource를 주입받은 jdbc 템플릿
     private final JdbcTemplate jdbcTemplate;
 
     private RowMapper<Customer> customerRowMapper = (resultSet, i) -> {
@@ -40,11 +38,9 @@ public class JdbcCustomerRepository implements CustomerRepository {
         return new Customer(customerId, customerName, customerEmail, lastLoginAt, createdAt);
     };
 
-    public JdbcCustomerRepository(DataSource dataSource, JdbcTemplate jdbcTemplate) {
-        this.dataSource = dataSource;
+    public JdbcCustomerRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
 
 
     @Override

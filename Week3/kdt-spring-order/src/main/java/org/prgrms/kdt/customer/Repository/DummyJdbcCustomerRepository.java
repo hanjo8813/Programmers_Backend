@@ -1,11 +1,13 @@
 package org.prgrms.kdt.customer.Repository;
 
 
+import org.prgrms.kdt.customer.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -137,25 +139,76 @@ public class DummyJdbcCustomerRepository {
         return 0;
     }
 
-
-    static UUID toUUID(byte[] bytes){
+    static UUID toUUID(byte[] bytes) {
         var byteBuffer = ByteBuffer.wrap(bytes);
         return new UUID(byteBuffer.getLong(), byteBuffer.getLong());
+    }
+
+
+    public void transactionTest(Customer customer) {
+        String updateNameSql = "update customers set name = ? where customer_id = UUID_TO_BIN(?)";
+        String updateEmailSql = "update customers set email = ? where customer_id = UUID_TO_BIN(?)";
+
+        Connection connection = null;
+
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/order_mgmt", "root", "root1234");
+            try (
+                    var updateNameStatement = connection.prepareStatement(updateNameSql);
+                    var updateEmailStatement = connection.prepareStatement(updateEmailSql);
+            ) {
+                // 오토 커밋을 풀어서 커밋 전까지는 하나의 트랜잭션으로 묶이게 만든다
+                connection.setAutoCommit(false);
+                updateNameStatement.setString(1, customer.getName());
+                updateNameStatement.setBytes(2, customer.getCustomerId().toString().getBytes());
+                updateNameStatement.executeUpdate();
+
+                updateEmailStatement.setString(1, customer.getEmail());
+                updateEmailStatement.setBytes(2, customer.getCustomerId().toString().getBytes());
+                updateEmailStatement.executeUpdate();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    connection.close();
+                } catch (SQLException ex) {
+                    logger.error("{}", ex);
+                }
+            }
+            logger.error("{}", e);
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static void main(String[] args) throws SQLException {
         var customerRepository = new DummyJdbcCustomerRepository();
 
-        // 데이터 삭제
-        customerRepository.deleteAllCustomer();
+        //797eee6a-2741-4d03-a2e8-9f87fb0d95d1
+        customerRepository.transactionTest(
+                new Customer(
+                        UUID.fromString("797eee6a-2741-4d03-a2e8-9f87fb0d95d1"),
+                        "update-user",
+                        "new-user2@mail.com",
+                        LocalDateTime.now()
+                )
+        );
 
-        // 데이터 삽입
-        var newCustomerId = UUID.randomUUID();
-        logger.info("새로 삽입되는 uuid -> {}", newCustomerId);
-        customerRepository.insertCustomer(newCustomerId, "new-user1", "new-user@mail.com");
 
+//        // 데이터 삭제
+//        customerRepository.deleteAllCustomer();
+//
+//        // 데이터 삽입
+//        var newCustomerId = UUID.randomUUID();
+//        logger.info("새로 삽입되는 uuid -> {}", newCustomerId);
+//        customerRepository.insertCustomer(newCustomerId, "new-user1", "new-user1@mail.com");
+//        customerRepository.insertCustomer(newCustomerId, "new-user2", "new-user2@mail.com");
 
-        customerRepository.findAllId().forEach(v -> logger.info("uuid -> {}", v));
+//
+//
+//        customerRepository.findAllId().forEach(v -> logger.info("uuid -> {}", v));
 
 
 //        // 데이터 수정
