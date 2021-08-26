@@ -1,4 +1,4 @@
-package org.prgrms.kdt;
+package org.prgrms.kdt.customer.Repository;
 
 
 import org.slf4j.Logger;
@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class JdbcCustomerRepository {
+public class DummyJdbcCustomerRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcCustomerRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(DummyJdbcCustomerRepository.class);
     private final String SELECT_BY_NAME_SQL = "select * from customers where name = ?";
     private final String SELECT_ALL_SQL = "select * from customers";
     private final String INSERT_SQL = "insert into customers(customer_id, name, email) values (UUID_TO_BIN(?), ?, ?)";
@@ -144,7 +144,7 @@ public class JdbcCustomerRepository {
     }
 
     public static void main(String[] args) throws SQLException {
-        var customerRepository = new JdbcCustomerRepository();
+        var customerRepository = new DummyJdbcCustomerRepository();
 
         // 데이터 삭제
         customerRepository.deleteAllCustomer();

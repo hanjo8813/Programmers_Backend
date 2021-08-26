@@ -28,6 +28,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Spring JDBC-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
 		<!-- jdbc 드라이버 -->
 		<dependency>
 			<groupId>mysql</groupId>

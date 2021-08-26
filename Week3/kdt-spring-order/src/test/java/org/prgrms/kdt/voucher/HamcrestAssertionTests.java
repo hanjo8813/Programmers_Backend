@@ -16,7 +16,7 @@ public class HamcrestAssertionTests {
     void hamcrestTest() {
         // 기대값, 테스트값
         assertEquals(2, 1+1);
-        // 테스트값, 기대값
+        // 실제값 -> 테스트값, 기대값
         assertThat(1 +1, is(2));
         assertThat(1 +1, anyOf(is(2), is(2)));
 
