@@ -3,24 +3,38 @@ package org.prgrms.kdt.customer.Repository;
 import org.prgrms.kdt.customer.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.*;
 
 
 @Repository
+@Primary
 public class JdbcCustomerNamedRepository implements CustomerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcCustomerNamedRepository.class);
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+
+    //private final TransactionTemplate transactionTemplate;
+
+    public JdbcCustomerNamedRepository(NamedParameterJdbcTemplate jdbcTemplate /*, TransactionTemplate transactionTemplate*/) {
+        this.jdbcTemplate = jdbcTemplate;
+        //this.transactionTemplate = transactionTemplate;
+    }
+
 
     private Map<String, Object> toParamMap(Customer customer) {
         return new HashMap<>() {{
@@ -43,9 +57,6 @@ public class JdbcCustomerNamedRepository implements CustomerRepository {
         return new Customer(customerId, customerName, customerEmail, lastLoginAt, createdAt);
     };
 
-    public JdbcCustomerNamedRepository(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Customer insert(Customer customer) {
@@ -147,4 +158,22 @@ public class JdbcCustomerNamedRepository implements CustomerRepository {
         var byteBuffer = ByteBuffer.wrap(bytes);
         return new UUID(byteBuffer.getLong(), byteBuffer.getLong());
     }
+
+
+//    // 트랜잭션 테스트트
+//   public void testTransaction(Customer customer){
+//        // dd
+//        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+//            @Override
+//            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+//                jdbcTemplate.update(
+//                        "update customers set name = :name where customer_id = UUID_TO_BIN(:customer_id)",
+//                        toParamMap(customer));
+//                jdbcTemplate.update(
+//                        "update customers set email = :email where customer_id = UUID_TO_BIN(:customer_id)",
+//                        toParamMap(customer));
+//            }
+//        });
+//    }
+
 }

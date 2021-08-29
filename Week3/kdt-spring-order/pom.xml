@@ -34,6 +34,13 @@
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
 
+		<!-- Spring AOP -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+
 		<!-- jdbc 드라이버 -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -48,6 +55,8 @@
 			<version>4.6.1</version>
 			<scope>test</scope>
 		</dependency>
+
+
 
 		<!-- Embedded Database - h2 -->
 <!--		<dependency>-->

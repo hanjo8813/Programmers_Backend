@@ -10,10 +10,14 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
@@ -47,13 +51,24 @@ class JdbcCustomerNamedRepositoryTest {
         }
 
         @Bean
-        public JdbcTemplate jdbcTemplate(DataSource dataSource){
+        public JdbcTemplate jdbcTemplate(DataSource dataSource) {
             return new JdbcTemplate(dataSource);
         }
 
         @Bean
-        public NamedParameterJdbcTemplate namedParameterJdbcTemplate(JdbcTemplate jdbcTemplate){
+        public NamedParameterJdbcTemplate namedParameterJdbcTemplate(JdbcTemplate jdbcTemplate) {
             return new NamedParameterJdbcTemplate(jdbcTemplate);
+        }
+
+        // dataSource를 주입받고 -> DataSourceTransactionManager생성하기 -> JdbcCustomerNamedRepository에서 사용가능
+        @Bean
+        public PlatformTransactionManager platformTransactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
+
+        @Bean
+        public TransactionTemplate transactionTemplate(PlatformTransactionManager platformTransactionManager) {
+            return new TransactionTemplate(platformTransactionManager);
         }
     }
 
@@ -67,7 +82,7 @@ class JdbcCustomerNamedRepositoryTest {
 
     @BeforeAll
     void setup() {
-        newCustomer = new Customer(UUID.randomUUID(), "test-user", "test-user.mail.com", LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)) ;
+        newCustomer = new Customer(UUID.randomUUID(), "test-user", "test-user.mail.com", LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
         jdbcCustomerRepository.deleteAll();
     }
 
@@ -80,7 +95,7 @@ class JdbcCustomerNamedRepositoryTest {
     @Test
     @Order(2)
     @DisplayName("고객을 추가할 수 있다.")
-    public void testInsert(){
+    public void testInsert() {
 
 //        try{
 //            jdbcCustomerRepository.insert(newCustomer);
@@ -108,7 +123,7 @@ class JdbcCustomerNamedRepositoryTest {
     @Test
     @Order(4)
     @DisplayName("이름으로 고객을 조회할 수 있다.")
-    public void testFindByName(){
+    public void testFindByName() {
         var customer = jdbcCustomerRepository.findByName(newCustomer.getName());
         assertThat(customer.isEmpty(), is(false));
 
@@ -141,6 +156,33 @@ class JdbcCustomerNamedRepositoryTest {
         var retrievedCustomer = jdbcCustomerRepository.findById(newCustomer.getCustomerId());
         assertThat(retrievedCustomer.isEmpty(), is(false));
         assertThat(retrievedCustomer.get(), samePropertyValuesAs(newCustomer));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("트랜잭션 테스트")
+    public void testTransaction() {
+//        var prevOne = jdbcCustomerRepository.findById(newCustomer.getCustomerId());
+//        assertThat(prevOne.isEmpty(), is(false));
+//
+//        var newOne = new Customer(UUID.randomUUID(), "a", "a@mail.com", LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+//        var insertedNewOne = jdbcCustomerRepository.insert(newOne);
+//
+//        try {
+//            jdbcCustomerRepository.testTransaction(new Customer(
+//                    insertedNewOne.getCustomerId(),
+//                    "b",
+//                    prevOne.get().getEmail(),
+//                    newOne.getCreatedAt()
+//            ));
+//        } catch (DataAccessException e) {
+//        }
+//
+//        var maybeNewOne = jdbcCustomerRepository.findById(insertedNewOne.getCustomerId());
+//
+//        assertThat(maybeNewOne.isEmpty(), is(false));
+//        assertThat(maybeNewOne.get(), samePropertyValuesAs(newOne));
+
     }
 
 
