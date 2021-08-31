@@ -1,9 +1,7 @@
-package org.prgrms.kdt.customer.Repository;
+package org.prgrms.kdt.customer.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-import com.wix.mysql.EmbeddedMysql;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.*;
 import org.prgrms.kdt.customer.Customer;
@@ -13,22 +11,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
-
 
 
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
-import static com.wix.mysql.ScriptResolver.classPathScript;
-import static com.wix.mysql.distribution.Version.v8_0_11;
-import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
-import static com.wix.mysql.config.Charset.UTF8;
-
 
 
 import javax.sql.DataSource;

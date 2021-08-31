@@ -1,4 +1,4 @@
-package org.prgrms.kdt.customer.Repository;
+package org.prgrms.kdt.customer.repository;
 
 import org.prgrms.kdt.customer.Customer;
 import org.slf4j.Logger;
@@ -8,18 +8,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.nio.ByteBuffer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 
-@Repository
+//@Repository
 public class JdbcCustomerRepository implements CustomerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcCustomerRepository.class);

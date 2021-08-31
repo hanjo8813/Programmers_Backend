@@ -2,8 +2,10 @@ package org.prgrms.kdt.customer;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.*;
-import org.prgrms.kdt.customer.Repository.CustomerRepository;
-import org.prgrms.kdt.customer.Repository.JdbcCustomerNamedRepository;
+import org.prgrms.kdt.customer.repository.CustomerRepository;
+import org.prgrms.kdt.customer.repository.JdbcCustomerNamedRepository;
+import org.prgrms.kdt.customer.service.CustomerService;
+import org.prgrms.kdt.customer.service.CustomerServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +16,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.support.TransactionTemplate;
+
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.*;
+
 import javax.sql.DataSource;
 
 import java.time.LocalDateTime;

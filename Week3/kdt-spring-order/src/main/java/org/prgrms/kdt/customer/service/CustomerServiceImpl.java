@@ -1,9 +1,9 @@
-package org.prgrms.kdt.customer;
+package org.prgrms.kdt.customer.service;
 
-import org.prgrms.kdt.customer.Repository.CustomerRepository;
+import org.prgrms.kdt.customer.Customer;
+import org.prgrms.kdt.customer.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,5 +22,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(isolation= Isolation.DEFAULT )
     public void createCustomers(List<Customer> customers) {
         customers.forEach(customerRepository::insert);
+    }
+
+    @Override
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
     }
 }
