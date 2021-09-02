@@ -1,4 +1,4 @@
-package org.prgrms.kdt.customer;
+package org.prgrms.kdt.customer.dto;
 
 public record CreateCustomerRequest(String email, String name){
 }

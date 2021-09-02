@@ -28,10 +28,7 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
@@ -124,8 +121,17 @@ public class KdtWebApplicationInitializer implements WebApplicationInitializer {
             var modules = Jackson2ObjectMapperBuilder.json().modules(javaTimeModule);
             converters.add(1, new MappingJackson2HttpMessageConverter(modules.build()));
         }
-    }
 
+        // CORS 설정
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            // api/ 하위로 들어오는 모든 origin의 요청을 허용한다
+            // 단 GET만 허용
+            registry.addMapping("/api/**")
+                    .allowedMethods("GET")
+                    .allowedOrigins("*");
+        }
+    }
 
     @Configuration
     @ComponentScan(basePackages = "org.prgrms.kdt.customer",
@@ -172,7 +178,7 @@ public class KdtWebApplicationInitializer implements WebApplicationInitializer {
         // root App Context 객체 등록
         var rootApplicationContext = new AnnotationConfigWebApplicationContext();
         rootApplicationContext.register(RootConfig.class);
-        // ??
+        // ContextLoaderListener를 통해 부모자식으로 연결?
         var loaderListener = new ContextLoaderListener(rootApplicationContext);
         servletContext.addListener(loaderListener);
 
