@@ -2,6 +2,7 @@ package org.prgrms.kdt.customer;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.*;
+import org.prgrms.kdt.customer.model.Customer;
 import org.prgrms.kdt.customer.repository.CustomerRepository;
 import org.prgrms.kdt.customer.repository.JdbcCustomerNamedRepository;
 import org.prgrms.kdt.customer.service.CustomerService;

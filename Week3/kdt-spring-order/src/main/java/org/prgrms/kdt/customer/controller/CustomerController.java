@@ -1,7 +1,6 @@
-package org.prgrms.kdt.customer;
+package org.prgrms.kdt.customer.controller;
 
-import org.prgrms.kdt.customer.dto.CreateCustomerRequest;
-import org.prgrms.kdt.customer.dto.CustomerDto;
+import org.prgrms.kdt.customer.model.Customer;
 import org.prgrms.kdt.customer.service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class CustomerController {
     @PostMapping("/api/test")
     @ResponseBody
     public String test() {
-        logger.info("POST 요청 잘 받았다");
+        logger.info("POST 요청 잘 받았다 z");
         return "Hello React";
     }
 
@@ -93,7 +92,7 @@ public class CustomerController {
         return customerService.getAllCustomers();
     }
 
-
+    @CrossOrigin(origins="*")
     @GetMapping("/api/v1/customers/{customerId}")
     @ResponseBody
     public ResponseEntity<Customer> findCustomer(@PathVariable("customerId") UUID customerId) {

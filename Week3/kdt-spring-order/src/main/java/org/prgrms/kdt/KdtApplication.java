@@ -1,32 +1,40 @@
 package org.prgrms.kdt;
 
-import org.prgrms.kdt.order.properties.OrderProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.prgrms.kdt.config.MvcConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.prgrms.kdt.order", "org.prgrms.kdt.voucher"})
+@ComponentScan(
+		basePackages = {"org.prgrms.kdt.customer", "org.prgrms.kdt.config"},
+		includeFilters = @ComponentScan.Filter(
+				type = FilterType.ASSIGNABLE_TYPE,
+				value = MvcConfig.class
+		),
+		useDefaultFilters = false
+)
 public class KdtApplication {
 
-	private static final Logger logger = LoggerFactory.getLogger(OrderTester.class);
+	public static void main(String[] args){
+		SpringApplication.run(KdtApplication.class, args);
 
-	public static void main(String[] args) {
 
-		var springApplication = new SpringApplication(KdtApplication.class);
-		springApplication.setAdditionalProfiles("dev");
-		var applicationContext = springApplication.run(args);
 
-		//var applicationContext = SpringApplication.run(KdtApplication.class, args);
 
-		var orderProperties = applicationContext.getBean(OrderProperties.class);
-		logger.warn("logger name => {}", logger.getName());
-		logger.warn("version -> {}", orderProperties.getVersion());
-		logger.warn("minimumOrderAmount -> {}", orderProperties.getMinimumOrderAmount());
-		logger.warn("supportVendors -> {}", orderProperties.getSupportVendors());
-		logger.warn("description -> {}", orderProperties.getDescription());
+//		var springApplication = new SpringApplication(KdtApplication.class);
+//		springApplication.setAdditionalProfiles("dev");
+//		var applicationContext = springApplication.run(args);
+//
+//		//var applicationContext = SpringApplication.run(KdtApplication.class, args);
+//
+//		var orderProperties = applicationContext.getBean(OrderProperties.class);
+//		logger.warn("logger name => {}", logger.getName());
+//		logger.warn("version -> {}", orderProperties.getVersion());
+//		logger.warn("minimumOrderAmount -> {}", orderProperties.getMinimumOrderAmount());
+//		logger.warn("supportVendors -> {}", orderProperties.getSupportVendors());
+//		logger.warn("description -> {}", orderProperties.getDescription());
 //
 //		var orderProperties = applicationContext.getBean(OrderProperties.class);
 //		System.out.println(MessageFormat.format("version -> {0}", orderProperties.getVersion()));
@@ -43,5 +51,4 @@ public class KdtApplication {
 //        System.out.println(MessageFormat.format("is Jdbc Repo -> {0} ", voucherRepository.getClass().getCanonicalName()));
 
 	}
-
 }

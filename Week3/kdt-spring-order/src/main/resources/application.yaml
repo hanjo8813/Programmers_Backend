@@ -2,14 +2,32 @@
 #  level:
 #    root: warn
 
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/order_mgmt
+    username: root
+    password: root1234
+  thymeleaf:
+    view-names: "views/*"
+    prefix: "/WEB-INF/"
+
+logging:
+  level:
+    org.springframework: DEBUG
+
+#server:
+#  servlet:
+#    context-path: /kdt_war_exploded
+
+
 kdt:
   version: "v1.0-default"
-  minimum-order-amount : 1
-  support-vendors :
+  minimum-order-amount: 1
+  support-vendors:
     - a
     - b
     - c
-  description : |-
+  description: |-
     line 1 a
     line 2 b
     line 3 c

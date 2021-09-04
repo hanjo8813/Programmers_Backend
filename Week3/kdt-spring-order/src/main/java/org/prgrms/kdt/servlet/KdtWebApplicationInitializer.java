@@ -3,7 +3,7 @@ package org.prgrms.kdt.servlet;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.zaxxer.hikari.HikariDataSource;
-import org.prgrms.kdt.customer.CustomerController;
+import org.prgrms.kdt.customer.controller.CustomerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -20,9 +20,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.oxm.xstream.XStreamMarshaller;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -123,14 +121,14 @@ public class KdtWebApplicationInitializer implements WebApplicationInitializer {
         }
 
         // CORS 설정
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            // api/ 하위로 들어오는 모든 origin의 요청을 허용한다
-            // 단 GET만 허용
-            registry.addMapping("/api/**")
-                    .allowedMethods("GET")
-                    .allowedOrigins("*");
-        }
+//        @Override
+//        public void addCorsMappings(CorsRegistry registry) {
+//            // api/ 하위로 들어오는 모든 origin의 요청을 허용한다
+//            // 단 GET만 허용
+//            registry.addMapping("/api/**")
+//                    .allowedMethods("GET")
+//                    .allowedOrigins("*");
+//        }
     }
 
     @Configuration

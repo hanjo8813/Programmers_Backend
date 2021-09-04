@@ -1,7 +1,7 @@
 package org.prgrms.kdt.customer.repository;
 
 
-import org.prgrms.kdt.customer.Customer;
+import org.prgrms.kdt.customer.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
