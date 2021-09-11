@@ -1,4 +1,4 @@
-package com.example.gccoffee.Repository;
+package com.example.gccoffee.repository;
 
 import com.example.gccoffee.model.Category;
 import com.example.gccoffee.model.Product;
