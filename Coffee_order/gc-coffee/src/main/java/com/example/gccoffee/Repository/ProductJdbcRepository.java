@@ -52,7 +52,7 @@ public class ProductJdbcRepository implements ProductRepository {
     public Optional<Product> findById(UUID productId) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                            "select * from products whdre product_id = UUID_TO_BIN(:productId)",
+                            "select * from products where product_id = UUID_TO_BIN(:productId)",
                             Collections.singletonMap("productId", productId.toString().getBytes()),
                             productRowMapper
                     )

@@ -8,3 +8,16 @@ create table products
     created_at   datetime(6) not null,
     updated_at   datetime(6) default null
 );
+
+
+DELIMITER //
+
+CREATE FUNCTION UUID_TO_BIN(uuid CHAR(36))
+    RETURNS BINARY(16) DETERMINISTIC
+BEGIN
+RETURN UNHEX(CONCAT(REPLACE(uuid, '-', '')));
+END; //
+
+DELIMITER ;
+
+
