@@ -7,9 +7,9 @@ import axios from "axios";
 
 function App() {
     const [products, setProducts] = useState([
-        {productId: 'uuid-1', productName: '콜롬비아 커피 1', category: '커피빈', price: 5000},
-        {productId: 'uuid-2', productName: '콜롬비아 커피 2', category: '커피빈', price: 5000},
-        {productId: 'uuid-3', productName: '콜롬비아 커피 3', category: '커피빈', price: 5000},
+        // {productId: 'uuid-1', productName: '콜롬비아 커피 1', category: '커피빈', price: 5000},
+        // {productId: 'uuid-2', productName: '콜롬비아 커피 2', category: '커피빈', price: 5000},
+        // {productId: 'uuid-3', productName: '콜롬비아 커피 3', category: '커피빈', price: 5000},
     ]);
     const [items, setItems] = useState([]);
     const handleAddClicked = productId => {

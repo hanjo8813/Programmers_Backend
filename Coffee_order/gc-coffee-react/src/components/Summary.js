@@ -2,6 +2,7 @@ import {SummaryItem} from "./SummaryItem";
 import React, {useState} from "react";
 
 export function Summary({items = [], onOrderSubmit}) {
+
     const totalPrice = items.reduce((prev, curr) => prev + (curr.price * curr.count), 0);
     const [order, setOrder] = useState({
         email: "", address: "", postcode: ""
