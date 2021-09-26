@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static com.example.gccoffee.JdbcUtils.toLocalDateTime;
-import static com.example.gccoffee.JdbcUtils.toUUID;
+import static com.example.gccoffee.utils.JdbcUtils.toLocalDateTime;
+import static com.example.gccoffee.utils.JdbcUtils.toUUID;
 
 
 @Repository

@@ -19,10 +19,6 @@ public class OrderRestController {
 
     @PostMapping("/api/v1/orders")
     public Order createOrder(@RequestBody CreateOrderRequest orderRequest) {
-        System.out.println(orderRequest.email());
-        System.out.println(orderRequest.address());
-        System.out.println(orderRequest.postcode());
-        System.out.println(orderRequest.orderItems());
         return orderService.createOrder(
                 new Email(orderRequest.email()),
                 orderRequest.address(),
