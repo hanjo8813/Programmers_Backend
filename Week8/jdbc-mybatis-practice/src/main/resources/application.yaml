@@ -4,3 +4,17 @@ spring:
     url: jdbc:h2:~/test;
     username: sa
     password:
+  jpa:
+    generate-ddl: true
+    open-in-view: false
+    show-sql: true
+
+mybatis:
+#  쿼리결과(Result Set)을 어떤 자바 객체로 매핑할지 지정한다
+  type-aliases-package: com.example.practice.repository.domain
+#  type-handlers-package: com.example.practice.repository.typehandler
+  configuration:
+    map-underscore-to-camel-case: true  # 매핑결과 객체명은 카멜케이스로
+    default-fetch-size: 100             # 쿼리 레코드 몇개가져올거?
+    default-statement-timeout: 30       # statement 타임아웃 설정
+  mapper-locations: classpath:mapper/*.xml  # 쿼리를 어디에 관리할건지?
