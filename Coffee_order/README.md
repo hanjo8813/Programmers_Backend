@@ -21,7 +21,7 @@
 - Spring Boot 2.5.4
 - Maven 4
 - JDBC Template
-- Junit 4
+- Junit 5
 - MySQL 8 (on Docker)
 
 ### Frontend
