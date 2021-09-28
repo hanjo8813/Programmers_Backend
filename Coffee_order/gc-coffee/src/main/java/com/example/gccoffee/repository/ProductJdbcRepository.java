@@ -22,6 +22,29 @@ public class ProductJdbcRepository implements ProductRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private Map<String, Object> toParamMap(Product product) {
+        var paramMap = new HashMap<String, Object>();
+        paramMap.put("productId", product.getProductId().toString().getBytes());
+        paramMap.put("productName", product.getProductName());
+        paramMap.put("category", product.getCategory().toString());
+        paramMap.put("price", product.getPrice());
+        paramMap.put("description", product.getDescription());
+        paramMap.put("createdAt", product.getCreatedAt());
+        paramMap.put("updatedAt", product.getUpdatedAt());
+        return paramMap;
+    }
+
+    private static final RowMapper<Product> productRowMapper = (resultSet, i) -> {
+        var productId = toUUID(resultSet.getBytes("product_id"));
+        var productName = resultSet.getString("product_name");
+        var category = Category.valueOf(resultSet.getString("category"));
+        var price = resultSet.getLong("price");
+        var description = resultSet.getString("description");
+        var createdAt = toLocalDateTime(resultSet.getTimestamp("created_at"));
+        var updatedAt = toLocalDateTime(resultSet.getTimestamp("updated_at"));
+        return new Product(productId, productName, category, price, description, createdAt, updatedAt);
+    };
+
     @Override
     public List<Product> findAll() {
         return jdbcTemplate.query(
@@ -39,19 +62,6 @@ public class ProductJdbcRepository implements ProductRepository {
         );
         if (update != 1) {
             throw new RuntimeException("Nothing was inserted");
-        }
-        return product;
-    }
-
-    @Override
-    public Product update(Product product) {
-        var update = jdbcTemplate.update(
-                "update products set product_name = :productName, category=:category, price=:price,description=:description,created_at=:createdAt, updated_at=:updatedAt " +
-                        "where product_id = UUID_TO_BIN(:productId)",
-                toParamMap(product)
-                );
-        if (update != 1) {
-            throw new RuntimeException("Nothing was updated");
         }
         return product;
     }
@@ -95,34 +105,24 @@ public class ProductJdbcRepository implements ProductRepository {
     }
 
     @Override
+    public Product update(Product product) {
+        var update = jdbcTemplate.update(
+                "update products set product_name = :productName, category=:category, price=:price,description=:description,created_at=:createdAt, updated_at=:updatedAt " +
+                        "where product_id = UUID_TO_BIN(:productId)",
+                toParamMap(product)
+                );
+        if (update != 1) {
+            throw new RuntimeException("Nothing was updated");
+        }
+        return product;
+    }
+
+    @Override
     public void deleteAll() {
         jdbcTemplate.update(
                 "delete from products",
                 Collections.emptyMap()
         );
-    }
-
-    private static final RowMapper<Product> productRowMapper = (resultSet, i) -> {
-        var productId = toUUID(resultSet.getBytes("product_id"));
-        var productName = resultSet.getString("product_name");
-        var category = Category.valueOf(resultSet.getString("category"));
-        var price = resultSet.getLong("price");
-        var description = resultSet.getString("description");
-        var createdAt = toLocalDateTime(resultSet.getTimestamp("created_at"));
-        var updatedAt = toLocalDateTime(resultSet.getTimestamp("updated_at"));
-        return new Product(productId, productName, category, price, description, createdAt, updatedAt);
-    };
-
-    private Map<String, Object> toParamMap(Product product) {
-        var paramMap = new HashMap<String, Object>();
-        paramMap.put("productId", product.getProductId().toString().getBytes());
-        paramMap.put("productName", product.getProductName());
-        paramMap.put("category", product.getCategory().toString());
-        paramMap.put("price", product.getPrice());
-        paramMap.put("description", product.getDescription());
-        paramMap.put("createdAt", product.getCreatedAt());
-        paramMap.put("updatedAt", product.getUpdatedAt());
-        return paramMap;
     }
 
 }

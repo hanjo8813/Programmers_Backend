@@ -18,12 +18,6 @@ public class DefaultProductService implements ProductService {
         this.productRepository = productRepository;
     }
 
-
-    @Override
-    public List<Product> getProductsByCategory(Category category) {
-        return productRepository.findByCategory(category);
-    }
-
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -33,6 +27,11 @@ public class DefaultProductService implements ProductService {
     public Product createProduct(String productName, Category category, long price) {
         var product = new Product(UUID.randomUUID(), productName, category, price);
         return productRepository.insert(product);
+    }
+
+    @Override
+    public List<Product> getProductsByCategory(Category category) {
+        return productRepository.findByCategory(category);
     }
 
     @Override

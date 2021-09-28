@@ -22,6 +22,7 @@ public class Product {
         this.updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 
+
     public Product(UUID productId, String productName, Category category, long price, String description) {
         this.productId = productId;
         this.productName = productName;

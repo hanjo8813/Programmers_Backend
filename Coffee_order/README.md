@@ -48,6 +48,60 @@
 
 <br>
 
+##  Rest API
+
+### 상품 목록 조회
+
+> Request
+```http request
+GET http://localhost:8080/api/v1/products
+```
+
+> Response
+```json
+[
+   { 
+       "productId": "", 
+       "productName": "",
+       "category": "",
+       "description": "",
+       "createdAt": "",
+       "updatedAt": ""
+   },
+] 
+```
+
+### 커피 주문
+
+> Request
+```http request
+POST http://localhost:8080/api/v1/orders
+```
+
+```json
+{
+  "orderId": "",
+  "email": {
+    "address": ""
+  },
+  "address": "",
+  "postcode": "",
+  "orderItems": [
+    {
+      "productId": "",
+      "category": "",
+      "price": "",
+      "quantity": ""
+    }
+  ],
+  "orderStatus": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+<br>
+
 ## 보완할 점
 
 - 고객의 주문 조회 기능
