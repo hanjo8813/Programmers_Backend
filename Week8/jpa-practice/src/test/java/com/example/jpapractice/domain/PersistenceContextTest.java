@@ -57,7 +57,7 @@ public class PersistenceContextTest {
         entityManager.persist(customer);
         transaction.commit();
 
-        // PC에 있는 Entity를 분리 (영속 -> 비영속)
+        // PC에 있는 Entity를 분리 (영속 -> 준영속)
         entityManager.detach(customer);
 
         // detach로 기존에 있던 1차캐시가 삭제되었으므로 select 쿼리를 실행하게된다.
@@ -99,9 +99,15 @@ public class PersistenceContextTest {
 
         // 다시 트랜잭션 시작
         transaction.begin();
-        // Entity를 변경해준다
+
         customer.setFirstName("first2");
-        customer.setFirstName("last2");
+        customer.setLastName("last2");
+
+        // 최종은 스냅샷과 비교
+        customer.setFirstName("first");
+        customer.setLastName("last");
+
+
         // Flush 발생시 Entity의 변경 감지 -> update 쿼리를 날려준다
         transaction.commit();
     }
@@ -124,6 +130,54 @@ public class PersistenceContextTest {
         entityManager.remove(customer);
         // Flush : Entity 삭제를 감지하고 delete 쿼리 날림
         transaction.commit();
+    }
+
+    @Test
+    void 동일성보장() {
+        EntityManager entityManager = emf.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setFirstName("first");
+        customer.setLastName("last");
+        entityManager.persist(customer);
+        transaction.commit();
+
+        // 1차캐시에서 가져옴
+        var selected1 = entityManager.find(Customer.class, 1L);
+        var selected3 = entityManager.find(Customer.class, 1L);
+        // 주소 비교
+        if(selected1 == selected3){
+            log.info("동일성 보장됨");
+        }
+
+        entityManager.detach(customer);
+
+        // select 쿼리로 DB에서 가져옴
+        var selected2 = entityManager.find(Customer.class, 1L);
+
+        // 주소 비교
+        if(selected1 == selected2){
+            log.info("동일성 보장됨");
+        }
+    }
+
+    @Test
+    void temp() {
+        EntityManager entityManager = emf.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setFirstName("first");
+        customer.setLastName("last");
+        entityManager.persist(customer);
+        transaction.commit();
+
+
     }
 
 

@@ -12,6 +12,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class DataSourceConfig {
@@ -39,14 +40,21 @@ public class DataSourceConfig {
 
     // Entity Manager를 만들어주는 팩토리
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, JpaVendorAdapter jpaVendorAdapter) {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, JpaVendorAdapter jpaVendorAdapter,
+                                                                       JpaProperties jpaProperties) {
+        LocalContainerEntityManagerFactoryBean em
+                = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        // Entity Manager가 관리하게 될 도메인 entity 패키지 경로를 명시
         em.setPackagesToScan("com.example.jpapractice.domain");
         em.setJpaVendorAdapter(jpaVendorAdapter);
+
+        Properties properties = new Properties();
+        properties.putAll(jpaProperties.getProperties());
+        em.setJpaProperties(properties);
+
         return em;
     }
+
 
     // jpa 트랙잭션 매니저 생성
     @Bean
