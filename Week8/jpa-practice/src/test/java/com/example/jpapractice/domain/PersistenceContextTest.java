@@ -1,5 +1,7 @@
 package com.example.jpapractice.domain;
 
+import com.example.jpapractice.domain.customer.Customer;
+import com.example.jpapractice.domain.customer.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
