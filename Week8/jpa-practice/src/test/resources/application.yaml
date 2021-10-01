@@ -12,10 +12,11 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate.format_sql: true
+
 
 server:
   servlet:
@@ -23,15 +24,3 @@ server:
       charset: UTF-8
       enabled: true
       force: true
-
-#  jpa:
-#    generate-ddl: true
-#    database: H2
-#    show-sql: true
-#    open-in-view: false
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.H2Dialect
-#        query.in_clause_parameter_padding: true
-#        hbm2ddl:
-#          auto: create-drop

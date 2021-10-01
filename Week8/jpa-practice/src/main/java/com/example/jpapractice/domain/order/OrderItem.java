@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,8 +27,8 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
 
-    @OneToMany(mappedBy = "orderItem")
-    private List<Item> items;
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL)
+    private List<Item> items = new ArrayList<>();
 
 
 
