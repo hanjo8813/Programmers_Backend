@@ -1,22 +1,22 @@
-//package com.example.jpapractice.config;
-//
-//import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.jdbc.datasource.DriverManagerDataSource;
-//import org.springframework.orm.jpa.JpaTransactionManager;
-//import org.springframework.orm.jpa.JpaVendorAdapter;
-//import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-//import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
-//import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-//import org.springframework.transaction.PlatformTransactionManager;
-//
-//import javax.sql.DataSource;
-//import java.util.Properties;
-//
-//@Configuration
-//public class DataSourceConfig {
-//
+// package com.example.jpapractice.config;
+
+// import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.jdbc.datasource.DriverManagerDataSource;
+// import org.springframework.orm.jpa.JpaTransactionManager;
+// import org.springframework.orm.jpa.JpaVendorAdapter;
+// import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+// import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
+// import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+// import org.springframework.transaction.PlatformTransactionManager;
+
+// import javax.sql.DataSource;
+// import java.util.Properties;
+
+// @Configuration
+// public class DataSourceConfig {
+
 //    @Bean
 //    public DataSource dataSource() {
 //        DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -26,7 +26,7 @@
 //        dataSource.setPassword("");
 //        return dataSource;
 //    }
-//
+
 //    // jpa는 하나의 인터페이스, 구현체는 hibernate
 //    // https://suhwan.dev/2019/02/24/jpa-vs-hibernate-vs-spring-data-jpa/
 //    @Bean
@@ -37,7 +37,7 @@
 //        adapter.setGenerateDdl(jpaProperties.isGenerateDdl());
 //        return adapter;
 //    }
-//
+
 //    // Entity Manager를 만들어주는 팩토리
 //    @Bean
 //    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, JpaVendorAdapter jpaVendorAdapter,
@@ -47,15 +47,15 @@
 //        em.setDataSource(dataSource);
 //        em.setPackagesToScan("com.example.jpapractice.domain");
 //        em.setJpaVendorAdapter(jpaVendorAdapter);
-//
+
 //        Properties properties = new Properties();
 //        properties.putAll(jpaProperties.getProperties());
 //        em.setJpaProperties(properties);
-//
+
 //        return em;
 //    }
-//
-//
+
+
 //    // jpa 트랙잭션 매니저 생성
 //    @Bean
 //    public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
@@ -63,4 +63,4 @@
 //        transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
 //        return transactionManager;
 //    }
-//}
+// }
