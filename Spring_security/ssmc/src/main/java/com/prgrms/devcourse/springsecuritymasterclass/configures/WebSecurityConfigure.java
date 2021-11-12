@@ -6,6 +6,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.boot.context.properties.bind.Bindable.mapOf;
 
 @Configuration
 @EnableWebSecurity
@@ -13,7 +21,15 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        super.configure(auth);
+//        Map encoders = new HashMap();
+//        encoders.put("noop", NoOpPasswordEncoder.getInstance());
+//        PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("noop", encoders);
+//        auth.inMemoryAuthentication()ㄴ
+//                .withUser("user").password(passwordEncoder.encode("user123")).roles("USER").and()
+//                .withUser("admin").password(passwordEncoder.encode("admin123")).roles("ADMIN");
+        auth.inMemoryAuthentication()
+                .withUser("user").password("{noop}user123").roles("USER").and()
+                .withUser("admin").password("{noop}admin123").roles("ADMIN");
     }
 
     // 전역설정 처리를 하는 API
@@ -35,9 +51,20 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .anyRequest().permitAll()
                     .and()
                 .formLogin()
-                    .defaultSuccessUrl("/")
-                    .permitAll()
+                    .defaultSuccessUrl("/")         // 로그인 성공시 url
+                    .permitAll()                    // ???
                     .and()
+                .rememberMe()
+                    .key("key")
+                    .tokenValiditySeconds(60*5)
+                    .rememberMeParameter("param")
+                    .rememberMeCookieName("cookie_name")
+                    .and()
+                .logout()
+                    .logoutUrl("/logout")           // 로그아웃 요청 url
+                    .logoutSuccessUrl("/login")     // 로그아웃 성공시 리다이렉트 url
+                    .invalidateHttpSession(true)    // ???
+                    .clearAuthentication(true)      // ??
         ;
     }
 }

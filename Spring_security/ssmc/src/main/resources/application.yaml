@@ -5,11 +5,11 @@ spring:
   thymeleaf:
     cache: true
 
-  security:
-    user:
-      name: user
-      password: user123
-      roles: USER
+#  security:
+#    user:
+#      name: user
+#      password: user123
+#      roles: USER
 
   messages:
     basename: i18n/messages
