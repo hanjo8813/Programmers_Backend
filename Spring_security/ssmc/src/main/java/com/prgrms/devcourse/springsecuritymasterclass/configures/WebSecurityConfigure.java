@@ -1,20 +1,20 @@
 package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
-import static org.springframework.boot.context.properties.bind.Bindable.mapOf;
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
@@ -24,7 +24,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 //        Map encoders = new HashMap();
 //        encoders.put("noop", NoOpPasswordEncoder.getInstance());
 //        PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("noop", encoders);
-//        auth.inMemoryAuthentication()ㄴ
+//        auth.inMemoryAuthentication()
 //                .withUser("user").password(passwordEncoder.encode("user123")).roles("USER").and()
 //                .withUser("admin").password(passwordEncoder.encode("admin123")).roles("ADMIN");
         auth.inMemoryAuthentication()
@@ -45,6 +45,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                     .antMatchers("/me").hasAnyRole("USER", "ADMIN") // 인증영역 : me 요청시 "USER", "ADMIN"이어야 한다.
+                    .antMatchers("/admin").access("hasRole('ADMIN') and isFullyAuthenticated()")    // 권한이 ADMIN + RememberMe로 접근하지 않아야 함
                     .anyRequest().permitAll()
                     .and()
                 .formLogin()
@@ -66,7 +67,24 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .anonymous()
                     .principal("익명유저")                                // 익명유저 name 지정
                     .authorities("ROLE_ANONYMOUS", "ROLE_UNKNOWN")      // 익명유저 권한 지정
+                    .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(customAccessDeniedHandler())
         ;
+    }
+
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response, e) -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication != null ? authentication.getPrincipal() : null ;
+            log.warn("{} 거절됨", principal, e);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("text/plain");
+            response.getWriter().write("## ACCESS DENIED ##");
+            response.getWriter().flush();
+            response.getWriter().close();
+        };
     }
 
 
