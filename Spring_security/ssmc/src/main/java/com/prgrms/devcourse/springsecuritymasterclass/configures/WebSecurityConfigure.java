@@ -1,9 +1,16 @@
 package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,15 +20,42 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
+
+    // SecurityContextHolder의 스레드 로컬 변수 전략을 변경
+//    public WebSecurityConfigure() {
+//        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+//    }
+
+    @Bean
+    @Qualifier("myAsyncTaskExecutor")
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(5);
+        executor.setThreadNamePrefix("my-executor");
+        return executor;
+    }
+
+    @Bean
+    public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(
+            @Qualifier("myAsyncTaskExecutor") AsyncTaskExecutor delegate
+    ) {
+        return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -51,13 +85,16 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                     .antMatchers("/me").hasAnyRole("USER", "ADMIN") // 인증영역 : me 요청시 "USER", "ADMIN"이어야 한다.
-                    .antMatchers("/admin").access("hasRole('ADMIN') and isFullyAuthenticated() and oddAdmin")    // 권한이 ADMIN + RememberMe로 접근하지 않아야 함
+                    .antMatchers("/admin").access("hasRole('ADMIN') and isFullyAuthenticated()")    // 권한이 ADMIN + RememberMe로 접근하지 않아야 함
                     .anyRequest().permitAll()
-                    .expressionHandler(securityExpressionHandler())     // 커스텀 핸들러 지정 (권한에 대한)
+                    .accessDecisionManager(accessDecisionManager())
+//                    .expressionHandler(securityExpressionHandler())     // 커스텀 핸들러 지정 (권한에 대한)
                     .and()
                 .formLogin()
                     .defaultSuccessUrl("/")                             // 로그인 성공시 url
                     .permitAll()                                        // ???
+                    .and()
+                .httpBasic()
                     .and()
                 .rememberMe()                                           // 쿠키를 통한 자동 로그인
                     .key("key")                                            //
@@ -110,6 +147,15 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 new AuthenticationTrustResolverImpl(),
                 "ROLE_"
         );
+    }
+
+    // 커스텀 OddAdminVoter 추가하기 + UnanimousBased 전략으로 접근 제어
+    @Bean
+    public AccessDecisionManager accessDecisionManager() {
+        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
+        voters.add(new WebExpressionVoter());
+        voters.add(new OddAdminVoter(new AntPathRequestMatcher("/admin")));
+        return new UnanimousBased(voters);
     }
 
 }
