@@ -2,6 +2,7 @@ package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -27,6 +32,7 @@ import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +40,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
+
+    private DataSource dataSource;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
 
     // SecurityContextHolder의 스레드 로컬 변수 전략을 변경
 //    public WebSecurityConfigure() {
@@ -57,26 +70,74 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
     }
 
+    // 비밀번호 인코더 설정 (설정 안하면 prefix 붙여줘야됨)
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+//    // UserDetailsService 커스텀 -> jdbcDao를 사용해 security-DB 연동
+//    @Bean
+//    public UserDetailsService userDetailsService(DataSource dataSource) {
+//        JdbcDaoImpl jdbcDao = new JdbcDaoImpl();
+//        jdbcDao.setDataSource(dataSource);
+//        jdbcDao.setUsersByUsernameQuery(
+//                "SELECT login_id, passwd, true FROM USERS WHERE login_id = ?"
+//        );
+//        jdbcDao.setGroupAuthoritiesByUsernameQuery(
+//                "SELECT " +
+//                    "u.login_id, g.name, p.name " +
+//                "FROM " +
+//                    "users u JOIN groups g ON u.group_id = g.id " +
+//                    "LEFT JOIN group_permission gp ON g.id = gp.group_id " +
+//                    "JOIN permissions p ON p.id = gp.permission_id " +
+//                "WHERE " +
+//                    "u.login_id = ?"
+//        );
+//        jdbcDao.setEnableAuthorities(false);
+//        jdbcDao.setEnableGroups(true);
+//        return jdbcDao;
+//    }
+
+    // AuthenticationManagerBuilder -> jdbcDao를 사용해 security-DB 연동
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        Map encoders = new HashMap();
-//        encoders.put("noop", NoOpPasswordEncoder.getInstance());
-//        PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("noop", encoders);
-//        auth.inMemoryAuthentication()
-//                .withUser("user").password(passwordEncoder.encode("user123")).roles("USER").and()
-//                .withUser("admin").password(passwordEncoder.encode("admin123")).roles("ADMIN");
-        auth.inMemoryAuthentication()
-                .withUser("user").password("{noop}user123").roles("USER").and()
-                .withUser("admin01").password("{noop}admin123").roles("ADMIN").and()
-                .withUser("admin02").password("{noop}admin123").roles("ADMIN")
+        auth.jdbcAuthentication()
+                .dataSource(dataSource)
+                .usersByUsernameQuery(
+                        "SELECT login_id, passwd, true FROM USERS WHERE login_id = ?"
+                )
+                .groupAuthoritiesByUsername(
+                        "SELECT " +
+                                "u.login_id, g.name, p.name " +
+                        "FROM " +
+                                "users u JOIN groups g ON u.group_id = g.id " +
+                                "LEFT JOIN group_permission gp ON g.id = gp.group_id " +
+                                "JOIN permissions p ON p.id = gp.permission_id " +
+                        "WHERE " +
+                                "u.login_id = ?"
+                )
+                .getUserDetailsService()
+                .setEnableAuthorities(false)
         ;
     }
+
+
+//    // 인메모리 유저 등록
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("user").password("{noop}user123").roles("USER").and()
+//                .withUser("admin01").password("{noop}admin123").roles("ADMIN").and()
+//                .withUser("admin02").password("{noop}admin123").roles("ADMIN")
+//        ;
+//    }
 
     // 전역설정 처리를 하는 API
     @Override
     public void configure(WebSecurity web) {
         // 보안설정 제외하기
-        web.ignoring().antMatchers("/assets/**");
+        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
     }
 
     // Spring security 설정하는 메소드
