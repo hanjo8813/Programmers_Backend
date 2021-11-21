@@ -1,4 +1,4 @@
-package com.prgrms.devcourse.springsecuritymasterclass.service;
+package com.prgrms.devcourse.springsecuritymasterclass.simple.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
 package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
+import com.prgrms.devcourse.springsecuritymasterclass.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,9 @@ import java.util.List;
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
-    private DataSource dataSource;
+// ----------------------------------------------------------------------------------------------------------
 
-    @Autowired
-    public void setDataSource(DataSource dataSource){
-        this.dataSource = dataSource;
-    }
-
-    // SecurityContextHolder의 스레드 로컬 변수 전략을 변경
+//    // SecurityContextHolder의 스레드 로컬 변수 전략을 변경
 //    public WebSecurityConfigure() {
 //        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 //    }
@@ -76,6 +72,20 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+// ----------------------------------------------------------------------------------------------------------
+
+//    // 인메모리 유저 등록
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("user").password("{noop}user123").roles("USER").and()
+//                .withUser("admin01").password("{noop}admin123").roles("ADMIN").and()
+//                .withUser("admin02").password("{noop}admin123").roles("ADMIN")
+//        ;
+//    }
+
+// ----------------------------------------------------------------------------------------------------------
+
 //    // UserDetailsService 커스텀 -> jdbcDao를 사용해 security-DB 연동
 //    @Bean
 //    public UserDetailsService userDetailsService(DataSource dataSource) {
@@ -99,39 +109,54 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 //        return jdbcDao;
 //    }
 
-    // AuthenticationManagerBuilder -> jdbcDao를 사용해 security-DB 연동
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .usersByUsernameQuery(
-                        "SELECT login_id, passwd, true FROM USERS WHERE login_id = ?"
-                )
-                .groupAuthoritiesByUsername(
-                        "SELECT " +
-                                "u.login_id, g.name, p.name " +
-                        "FROM " +
-                                "users u JOIN groups g ON u.group_id = g.id " +
-                                "LEFT JOIN group_permission gp ON g.id = gp.group_id " +
-                                "JOIN permissions p ON p.id = gp.permission_id " +
-                        "WHERE " +
-                                "u.login_id = ?"
-                )
-                .getUserDetailsService()
-                .setEnableAuthorities(false)
-        ;
-    }
+// ----------------------------------------------------------------------------------------------------------
 
-
-//    // 인메모리 유저 등록
+//    // AuthenticationManagerBuilder -> jdbcDao를 사용해 security-DB 연동
+//    private DataSource dataSource;
+//
+//    @Autowired
+//    public void setDataSource(DataSource dataSource){
+//        this.dataSource = dataSource;
+//    }
+//
 //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("user").password("{noop}user123").roles("USER").and()
-//                .withUser("admin01").password("{noop}admin123").roles("ADMIN").and()
-//                .withUser("admin02").password("{noop}admin123").roles("ADMIN")
+//        auth.jdbcAuthentication()
+//                .dataSource(dataSource)
+//                .usersByUsernameQuery(
+//                        "SELECT login_id, passwd, true FROM USERS WHERE login_id = ?"
+//                )
+//                .groupAuthoritiesByUsername(
+//                        "SELECT " +
+//                                "u.login_id, g.name, p.name " +
+//                        "FROM " +
+//                                "users u JOIN groups g ON u.group_id = g.id " +
+//                                "LEFT JOIN group_permission gp ON g.id = gp.group_id " +
+//                                "JOIN permissions p ON p.id = gp.permission_id " +
+//                        "WHERE " +
+//                                "u.login_id = ?"
+//                )
+//                .getUserDetailsService()
+//                .setEnableAuthorities(false)
 //        ;
 //    }
+
+// ----------------------------------------------------------------------------------------------------------
+
+    // Security - JPA 연동
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService){
+        this.userService = userService;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService);
+    }
+
+// ----------------------------------------------------------------------------------------------------------
 
     // 전역설정 처리를 하는 API
     @Override
