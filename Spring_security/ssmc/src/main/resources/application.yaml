@@ -16,6 +16,11 @@ spring:
     encoding: UTF-8
     cache-duration: PT1H
 
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: never  # 세션 스키마 설정 (아래서 따로 했음)
+
   h2:
     console:
       enabled: true
@@ -23,7 +28,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: "jdbc:h2:mem:spring_security;MODE=MYSQL;DB_CLOSE_DELAY=-1"
+    url: "jdbc:h2:file:./database/spring_security.db;MODE=MYSQL;DB_CLOSE_DELAY=-1"
     username: sa
     password:
     # 히카리 풀 설정
@@ -31,6 +36,14 @@ spring:
       minimum-idle: 1
       maximum-pool-size: 5
       pool-name: H2_DB
+
+  sql:
+    init:
+      platform: h2
+      mode: never   # 기본은 embedded / 파일 모드일경우 sql 초기화를 안해주므로 always/never 로 바꿔준다
+      schema-locations: classpath:sql/schema_new.sql, classpath:org/springframework/session/jdbc/schema-h2.sql
+      data-locations: classpath:sql/data_new.sql
+      encoding: UTF-8
 
   jpa:
     open-in-view: false
@@ -42,13 +55,6 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate.dialect: org.hibernate.dialect.H2Dialect
-
-  sql:
-    init:
-      platform: h2
-      schema-locations: classpath:sql/schema_new.sql
-      data-locations: classpath:sql/data_new.sql
-      encoding: UTF-8
 
 server:
   port: 443
