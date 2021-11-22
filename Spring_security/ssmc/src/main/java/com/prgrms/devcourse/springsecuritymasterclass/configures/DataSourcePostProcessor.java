@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 
 @Component
 public class DataSourcePostProcessor implements BeanPostProcessor {
-
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof DataSource && !(bean instanceof Log4jdbcProxyDataSource)) {

@@ -1,25 +1,14 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: spring security 01
-
-  thymeleaf:
-    cache: true
-
-#  security:
-#    user:
-#      name: user
-#      password: user123
-#      roles: USER
 
   messages:
     basename: i18n/messages
     encoding: UTF-8
     cache-duration: PT1H
-
-  session:
-    store-type: jdbc
-    jdbc:
-      initialize-schema: never  # 세션 스키마 설정 (아래서 따로 했음)
 
   h2:
     console:
@@ -28,7 +17,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: "jdbc:h2:file:./database/spring_security.db;MODE=MYSQL;DB_CLOSE_DELAY=-1"
+    url: "jdbc:h2:mem:spring_security;MODE=MYSQL;DB_CLOSE_DELAY=-1"
     username: sa
     password:
     # 히카리 풀 설정
@@ -40,8 +29,7 @@ spring:
   sql:
     init:
       platform: h2
-      mode: never   # 기본은 embedded / 파일 모드일경우 sql 초기화를 안해주므로 always/never 로 바꿔준다
-      schema-locations: classpath:sql/schema_new.sql, classpath:org/springframework/session/jdbc/schema-h2.sql
+      schema-locations: classpath:sql/schema_new.sql
       data-locations: classpath:sql/data_new.sql
       encoding: UTF-8
 
@@ -56,13 +44,8 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.H2Dialect
 
-server:
-  port: 443
-  ssl:
-    enabled: true
-    key-alias: prgrms_keystore
-    key-store: classpath:./cert/prgrms_keystore.p12
-    key-store-password: prgrms123
-    key-password: prgrms123
-    trust-store: classpath:./cert/prgrms_truststore.p12
-    trust-store-password: prgrms123
+jwt:
+  header: token
+  issuer: prgrms
+  client-secret: EENY5W0eegTf1naQB2eDeyCLl5kRS2b8xa5c4qLdS0hmVjtbvo8tOyhPMcAmtPuQ
+  expiry-seconds: 60

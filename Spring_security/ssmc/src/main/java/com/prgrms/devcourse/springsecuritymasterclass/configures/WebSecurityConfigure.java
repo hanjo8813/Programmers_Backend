@@ -1,5 +1,6 @@
 package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
+import com.prgrms.devcourse.springsecuritymasterclass.jwt.Jwt;
 import com.prgrms.devcourse.springsecuritymasterclass.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,22 +51,26 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 //        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 //    }
 
-    @Bean
-    @Qualifier("myAsyncTaskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(5);
-        executor.setThreadNamePrefix("my-executor");
-        return executor;
-    }
+// ----------------------------------------------------------------------------------------------------------
 
-    @Bean
-    public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(
-            @Qualifier("myAsyncTaskExecutor") AsyncTaskExecutor delegate
-    ) {
-        return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
-    }
+//    @Bean
+//    @Qualifier("myAsyncTaskExecutor")
+//    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//        executor.setCorePoolSize(3);
+//        executor.setMaxPoolSize(5);
+//        executor.setThreadNamePrefix("my-executor");
+//        return executor;
+//    }
+//
+//    @Bean
+//    public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(
+//            @Qualifier("myAsyncTaskExecutor") AsyncTaskExecutor delegate
+//    ) {
+//        return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
+//    }
+
+// ----------------------------------------------------------------------------------------------------------
 
     // 비밀번호 인코더 설정 (설정 안하면 prefix 붙여줘야됨)
     @Bean
@@ -144,13 +149,22 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
+    // jwt 설정 bean 등록
+    private final JwtConfigure jwtConfigure;
+
+    @Bean
+    public Jwt jwt() {
+        return new Jwt(
+                jwtConfigure.getIssuer(),
+                jwtConfigure.getClientSecret(),
+                jwtConfigure.getExpirySeconds()
+        );
+    }
+
+// ----------------------------------------------------------------------------------------------------------
+
     // Security - JPA 연동
     private final UserService userService;
-
-//    @Autowired
-//    public void setUserService(UserService userService){
-//        this.userService = userService;
-//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -159,59 +173,36 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
-    // 전역설정 처리를 하는 API
-    @Override
-    public void configure(WebSecurity web) {
-        // 보안설정 제외하기
-        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
-    }
+//    // 전역설정 처리를 하는 API
+//    @Override
+//    public void configure(WebSecurity web) {
+//        // 보안설정 제외하기
+//        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
+//    }
 
     // Spring security 설정하는 메소드
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/me").hasAnyRole("USER", "ADMIN") // 인증영역 : me 요청시 "USER", "ADMIN"이어야 한다.
-                    .antMatchers("/admin").access("hasRole('ADMIN') and isFullyAuthenticated()")    // 권한이 ADMIN + RememberMe로 접근하지 않아야 함
+                    .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN") // 인증영역 : me 요청시 "USER", "ADMIN"이어야 한다.
                     .anyRequest().permitAll()
-                    .accessDecisionManager(accessDecisionManager())
-//                    .expressionHandler(securityExpressionHandler())     // 커스텀 핸들러 지정 (권한에 대한)
                     .and()
-                .formLogin()
-                    .defaultSuccessUrl("/")                             // 로그인 성공시 url
-                    .permitAll()                                        // ???
-                    .and()
-                .httpBasic()
-                    .and()
-                .rememberMe()                                           // 쿠키를 통한 자동 로그인
-                    .key("key")                                            //
-                    .tokenValiditySeconds(60*5)                         // expire 기간 지정
-                    .rememberMeParameter("param")                       // 화면 체크박스의 'name' 속성을 지정
-                    .rememberMeCookieName("cookie_name")                //
-                    .and()
-                .logout()
-                    .logoutUrl("/logout")                               // 로그아웃 요청 url (default)
-                    .logoutSuccessUrl("/login")                         // 로그아웃 성공시 리다이렉트 url
-                    .invalidateHttpSession(true)                        // 로그아웃시 세션 제거하기 (default)
-                    .clearAuthentication(true)                          // security context 비우기 (default)
-                    .and()
-                .anonymous()
-                    .principal("익명유저")                                // 익명유저 name 지정
-                    .authorities("ROLE_ANONYMOUS", "ROLE_UNKNOWN")      // 익명유저 권한 지정
-                    .and()
+                .csrf().disable()
+                .headers().disable()
+                .formLogin().disable()
+                .httpBasic().disable()
+                .rememberMe().disable()
+                .logout().disable()
                 .sessionManagement()
-                    .invalidSessionUrl("/")
-                    .sessionFixation().changeSessionId()
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                    .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
-                        .and()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .exceptionHandling()
                     .accessDeniedHandler(customAccessDeniedHandler())
-
         ;
     }
+
+// ----------------------------------------------------------------------------------------------------------
 
     // AccessDeniedHandler 커스텀
     @Bean
@@ -228,21 +219,23 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         };
     }
 
-    // 커스텀한 SecurityExpressionHandler 팩토리 메소드
-    public SecurityExpressionHandler<FilterInvocation> securityExpressionHandler() {
-        return new CustomWebSecurityExpressionHandler(
-                new AuthenticationTrustResolverImpl(),
-                "ROLE_"
-        );
-    }
+// ----------------------------------------------------------------------------------------------------------
 
-    // 커스텀 OddAdminVoter 추가하기 + UnanimousBased 전략으로 접근 제어
-    @Bean
-    public AccessDecisionManager accessDecisionManager() {
-        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
-        voters.add(new WebExpressionVoter());
-        voters.add(new OddAdminVoter(new AntPathRequestMatcher("/admin")));
-        return new UnanimousBased(voters);
-    }
+//    // 커스텀한 SecurityExpressionHandler 팩토리 메소드
+//    public SecurityExpressionHandler<FilterInvocation> securityExpressionHandler() {
+//        return new CustomWebSecurityExpressionHandler(
+//                new AuthenticationTrustResolverImpl(),
+//                "ROLE_"
+//        );
+//    }
+//
+//    // 커스텀 OddAdminVoter 추가하기 + UnanimousBased 전략으로 접근 제어
+//    @Bean
+//    public AccessDecisionManager accessDecisionManager() {
+//        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
+//        voters.add(new WebExpressionVoter());
+//        voters.add(new OddAdminVoter(new AntPathRequestMatcher("/admin")));
+//        return new UnanimousBased(voters);
+//    }
 
 }
