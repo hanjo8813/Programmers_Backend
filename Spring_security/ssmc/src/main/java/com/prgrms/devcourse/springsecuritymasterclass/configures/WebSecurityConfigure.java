@@ -37,6 +37,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -144,12 +145,12 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 // ----------------------------------------------------------------------------------------------------------
 
     // Security - JPA 연동
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    public void setUserService(UserService userService){
-        this.userService = userService;
-    }
+//    @Autowired
+//    public void setUserService(UserService userService){
+//        this.userService = userService;
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
