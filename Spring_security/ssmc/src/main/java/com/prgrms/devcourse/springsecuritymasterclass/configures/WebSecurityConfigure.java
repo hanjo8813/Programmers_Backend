@@ -2,6 +2,7 @@ package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
 import com.prgrms.devcourse.springsecuritymasterclass.jwt.Jwt;
 import com.prgrms.devcourse.springsecuritymasterclass.jwt.JwtAuthenticationFilter;
+import com.prgrms.devcourse.springsecuritymasterclass.jwt.JwtAuthenticationProvider;
 import com.prgrms.devcourse.springsecuritymasterclass.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -151,13 +153,13 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
-    // Security - JPA 연동
-    private final UserService userService;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
-    }
+//    // Security - JPA 연동
+//    private final UserService userService;
+//
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(userService);
+//    }
 
 // ----------------------------------------------------------------------------------------------------------
 
@@ -187,6 +189,25 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
+    //
+    @Bean
+    public JwtAuthenticationProvider jwtAuthenticationProvider(Jwt jwt, UserService userService) {
+        return new JwtAuthenticationProvider(jwt, userService);
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Autowired
+    public void configureAuthentication(AuthenticationManagerBuilder builder, JwtAuthenticationProvider provider) {
+        builder.authenticationProvider(provider);
+    }
+
+// ----------------------------------------------------------------------------------------------------------
+
     // 전역설정 처리를 하는 API
     @Override
     public void configure(WebSecurity web) {
@@ -199,7 +220,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN") // 인증영역 : me 요청시 "USER", "ADMIN"이어야 한다.
+                    .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN") // 해당 주소 요청은 헤더에 jwt가 있어야만 한다.
                     .anyRequest().permitAll()
                     .and()
                 .csrf().disable()

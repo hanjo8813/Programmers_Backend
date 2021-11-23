@@ -42,6 +42,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+       // true flag 변경은 생성자를 통해서만 할 수 있도록~
         if (isAuthenticated) {
             throw new IllegalArgumentException("Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
         }

@@ -3,6 +3,7 @@ package com.prgrms.devcourse.springsecuritymasterclass.user;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 
@@ -24,6 +25,13 @@ public class User {
     @ManyToOne(optional = false)
     @JoinColumn(name = "group_id")
     private Group group;
+
+    public void checkPassword(PasswordEncoder passwordEncoder, String credentials) {
+        if (!passwordEncoder.matches(credentials, passwd)) {
+            throw new IllegalArgumentException("Bad Credential");
+        }
+    }
+
 
     @Override
     public String toString() {
