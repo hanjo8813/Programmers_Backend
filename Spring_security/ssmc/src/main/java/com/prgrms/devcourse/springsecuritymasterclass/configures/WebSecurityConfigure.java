@@ -1,6 +1,7 @@
 package com.prgrms.devcourse.springsecuritymasterclass.configures;
 
 import com.prgrms.devcourse.springsecuritymasterclass.jwt.Jwt;
+import com.prgrms.devcourse.springsecuritymasterclass.jwt.JwtAuthenticationFilter;
 import com.prgrms.devcourse.springsecuritymasterclass.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.http.HttpServletResponse;
@@ -149,20 +151,6 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
-    // jwt 설정 bean 등록
-    private final JwtConfigure jwtConfigure;
-
-    @Bean
-    public Jwt jwt() {
-        return new Jwt(
-                jwtConfigure.getIssuer(),
-                jwtConfigure.getClientSecret(),
-                jwtConfigure.getExpirySeconds()
-        );
-    }
-
-// ----------------------------------------------------------------------------------------------------------
-
     // Security - JPA 연동
     private final UserService userService;
 
@@ -173,12 +161,38 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
 // ----------------------------------------------------------------------------------------------------------
 
-//    // 전역설정 처리를 하는 API
-//    @Override
-//    public void configure(WebSecurity web) {
-//        // 보안설정 제외하기
-//        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
-//    }
+    // jwt 설정 bean 등록
+    private JwtConfigure jwtConfigure;
+
+    @Autowired
+    public void setJwtConfigure(JwtConfigure jwtConfigure) {
+        this.jwtConfigure = jwtConfigure;
+    }
+
+    @Bean
+    public Jwt jwt() {
+        return new Jwt(
+                jwtConfigure.getIssuer(),
+                jwtConfigure.getClientSecret(),
+                jwtConfigure.getExpirySeconds()
+        );
+    }
+// ----------------------------------------------------------------------------------------------------------
+
+    // Jwt 필터 팩토리 메소드
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        Jwt jwt = getApplicationContext().getBean(Jwt.class);
+        return new JwtAuthenticationFilter(jwtConfigure.getHeader(), jwt);
+    }
+
+// ----------------------------------------------------------------------------------------------------------
+
+    // 전역설정 처리를 하는 API
+    @Override
+    public void configure(WebSecurity web) {
+        // 보안설정 제외하기
+        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
+    }
 
     // Spring security 설정하는 메소드
     @Override
@@ -199,6 +213,8 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .and()
                 .exceptionHandling()
                     .accessDeniedHandler(customAccessDeniedHandler())
+                    .and()
+                .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
         ;
     }
 
